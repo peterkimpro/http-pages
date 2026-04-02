@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes 3 vs OpenAI - Comprehensive Model Comparison</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --hermes: #a371f7;
+    --hermes-dim: rgba(163,113,247,0.15);
+    --openai: #3fb950;
+    --openai-dim: rgba(63,185,80,0.15);
+    --accent: #58a6ff;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Header ---------- */
+  header {
+    background: linear-gradient(135deg, #1a0a2e 0%, #0d1117 40%, #0a1a0a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 0 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 300px at 25% 50%, rgba(163,113,247,0.12), transparent),
+      radial-gradient(ellipse 600px 300px at 75% 50%, rgba(63,185,80,0.10), transparent);
+    pointer-events: none;
+  }
+  header h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.5px; position: relative; }
+  header h1 .hermes { color: var(--hermes); }
+  header h1 .openai  { color: var(--openai); }
+  header h1 .vs { color: var(--text-muted); font-weight: 400; margin: 0 6px; }
+  header p { color: var(--text-muted); margin-top: 12px; font-size: 1.05rem; position: relative; }
+  .badge-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; position: relative; }
+  .badge {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding: 48px 0; }
+  .section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .icon { font-size: 1.3rem; }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  /* ---------- Feature Table ---------- */
+  .cmp-table { width: 100%; border-collapse: collapse; }
+  .cmp-table th, .cmp-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  .cmp-table thead th { background: rgba(255,255,255,0.03); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .cmp-table thead th:nth-child(2) { color: var(--hermes); }
+  .cmp-table thead th:nth-child(3) { color: var(--openai); }
+  .cmp-table tbody tr:last-child td { border-bottom: none; }
+  .cmp-table .feature-label { font-weight: 600; color: var(--text); white-space: nowrap; }
+  .cmp-table td:nth-child(2) { background: var(--hermes-dim); }
+  .cmp-table td:nth-child(3) { background: var(--openai-dim); }
+  .tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .tag-purple { background: rgba(163,113,247,0.2); color: var(--hermes); }
+  .tag-green  { background: rgba(63,185,80,0.2);  color: var(--openai); }
+  .tag-blue   { background: rgba(88,166,255,0.2);  color: var(--accent); }
+  .tag-yellow { background: rgba(210,153,34,0.2);  color: #d2992a; }
+
+  /* ---------- Benchmark Bars ---------- */
+  .bench-grid { display: grid; gap: 20px; }
+  .bench-item { padding: 20px; }
+  .bench-item + .bench-item { border-top: 1px solid var(--border); }
+  .bench-label { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+  .bench-label small { color: var(--text-muted); font-weight: 400; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .bar-name { width: 110px; flex-shrink: 0; font-size: 0.82rem; color: var(--text-muted); text-align: right; }
+  .bar-track { flex: 1; height: 22px; background: rgba(255,255,255,0.04); border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.75rem; font-weight: 700; transition: width .6s ease; }
+  .bar-fill.hermes { background: linear-gradient(90deg, rgba(163,113,247,0.5), var(--hermes)); color: #fff; }
+  .bar-fill.openai  { background: linear-gradient(90deg, rgba(63,185,80,0.5), var(--openai)); color: #fff; }
+  .bench-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; font-style: italic; }
+
+  /* ---------- Verdict Grid ---------- */
+  .verdict-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .verdict-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .verdict-card .vc-title { font-weight: 700; font-size: 0.95rem; }
+  .verdict-card .vc-winner { font-size: 0.82rem; font-weight: 600; }
+  .verdict-card .vc-reason { font-size: 0.82rem; color: var(--text-muted); }
+  .winner-hermes { color: var(--hermes); }
+  .winner-openai  { color: var(--openai); }
+  .winner-tie     { color: var(--accent); }
+
+  /* ---------- Pricing ---------- */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .price-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+  }
+  .price-card h3 { font-size: 1.1rem; margin-bottom: 4px; }
+  .price-card .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .price-card.hermes-card { border-top: 3px solid var(--hermes); }
+  .price-card.openai-card { border-top: 3px solid var(--openai); }
+  .price-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .price-row:last-child { border-bottom: none; }
+  .price-row .label { color: var(--text-muted); }
+  .price-row .value { font-weight: 600; }
+  .price-highlight { color: var(--hermes); }
+  .price-highlight-g { color: var(--openai); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ---------- Responsive ---------- */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  @media (max-width: 700px) {
+    header { padding: 36px 0 32px; }
+    section { padding: 32px 0; }
+    .cmp-table th, .cmp-table td { padding: 10px 12px; font-size: 0.84rem; }
+    .bar-name { width: 80px; font-size: 0.76rem; }
+    .verdict-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="container">
+    <h1><span class="hermes">Hermes 3</span><span class="vs">vs</span><span class="openai">OpenAI</span></h1>
+    <p>Open-weight local freedom meets cloud-scale proprietary power</p>
+    <div class="badge-row">
+      <span class="badge">Updated April 2026</span>
+      <span class="badge">Nous Research vs OpenAI</span>
+      <span class="badge">LLM Comparison</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+<!-- ============ FEATURE COMPARISON ============ -->
+<section>
+  <div class="section-title"><span class="icon">&#9881;</span> Feature Comparison</div>
+  <div class="card table-wrap">
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th style="min-width:140px;">Feature</th>
+          <th style="min-width:220px;">Hermes 3 (Nous Research)</th>
+          <th style="min-width:220px;">OpenAI (GPT-4o / o-series)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-label">Architecture</td>
+          <td>Fine-tuned Llama 3.1 base &mdash; decoder-only transformer <span class="tag tag-purple">Open Weights</span></td>
+          <td>Proprietary transformer architecture (undisclosed details) <span class="tag tag-green">Closed</span></td>
+        </tr>
+        <tr>
+          <td class="feature-label">Model Sizes</td>
+          <td>8B, 70B, 405B parameters &mdash; matching Llama 3.1 tiers</td>
+          <td>GPT-4o (rumored ~200B MoE), GPT-4o-mini, o1, o3, o4-mini</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Context Window</td>
+          <td>128K tokens (Llama 3.1 base); rope-scaled longer contexts possible</td>
+          <td>128K tokens (GPT-4o / o-series)</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Open Source</td>
+          <td><span class="tag tag-purple">Yes</span> &mdash; weights on HuggingFace, Llama 3.1 Community License</td>
+          <td><span class="tag tag-yellow">No</span> &mdash; API access only, proprietary</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Fine-Tuning</td>
+          <td>Full weight access: LoRA, QLoRA, full fine-tune, merging &mdash; unlimited</td>
+          <td>Limited fine-tuning API for GPT-4o-mini and GPT-4o; constrained hyperparams</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Privacy</td>
+          <td><span class="tag tag-purple">Full control</span> &mdash; runs entirely on your hardware, zero telemetry</td>
+          <td>Data sent to OpenAI servers; opt-out available for API; enterprise options</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Content Policy</td>
+          <td>Minimal built-in refusals; "Neutral" system prompt design; user-configurable guardrails</td>
+          <td>Strict RLHF alignment; content filtering layers; limited override ability</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Tool / Function Use</td>
+          <td>Trained with structured tool-call format; JSON function calling via ChatML-style prompts</td>
+          <td>Native function calling API; parallel tool use; structured outputs mode</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Agentic Capabilities</td>
+          <td>Strong agentic fine-tuning; multi-turn tool orchestration; role-play persona system</td>
+          <td>Computer use (Operator), Assistants API with code interpreter, file search, tools</td>
+        </tr>
+        <tr>
+          <td class="feature-label">Deployment</td>
+          <td>Self-host (vLLM, llama.cpp, TGI, Ollama), or via Nous API &amp; third-party providers</td>
+          <td>OpenAI API, Azure OpenAI, ChatGPT interface only</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ BENCHMARKS ============ -->
+<section>
+  <div class="section-title"><span class="icon">&#9889;</span> Benchmark Comparison</div>
+  <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:20px;">
+    Hermes 3 405B compared against GPT-4o. Smaller Hermes variants (8B, 70B) score lower.
+    Scores are approximate and sourced from Nous Research reports, community evals, and public leaderboards.
+  </p>
+  <div class="card bench-grid">
+
+    <!-- MATH-500 -->
+    <div class="bench-item">
+      <div class="bench-label">MATH-500 <small>&mdash; competition-level math</small></div>
+      <div class="bar-row">
+        <span class="bar-name">Hermes 3 405B</span>
+        <div class="bar-track"><div class="bar-fill hermes" style="width:70%;">70.2%</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">GPT-4o</span>
+        <div class="bar-track"><div class="bar-fill openai" style="width:76.4%;">76.4%</div></div>
+      </div>
+      <div class="bench-note">GPT-4o leads on hard math; Hermes 3 405B competitive for open-weight model</div>
+    </div>
+
+    <!-- HumanEval -->
+    <div class="bench-item">
+      <div class="bench-label">HumanEval <small>&mdash; Python code generation</small></div>
+      <div class="bar-row">
+        <span class="bar-name">Hermes 3 405B</span>
+        <div class="bar-track"><div class="bar-fill hermes" style="width:81.7%;">81.7%</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">GPT-4o</span>
+        <div class="bar-track"><div class="bar-fill openai" style="width:90.2%;">90.2%</div></div>
+      </div>
+      <div class="bench-note">Both strong at code; GPT-4o benefits from proprietary RLHF on code tasks</div>
+    </div>
+
+    <!-- GPQA -->
+    <div class="bench-item">
+      <div class="bench-label">GPQA Diamond <small>&mdash; graduate-level science QA</small></div>
+      <div class="bar-row">
+        <span class="bar-name">Hermes 3 405B</span>
+        <div class="bar-track"><div class="bar-fill hermes" style="width:50.4%;">50.4%</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">GPT-4o</span>
+        <div class="bar-track"><div class="bar-fill openai" style="width:53.6%;">53.6%</div></div>
+      </div>
+      <div class="bench-note">Notoriously hard benchmark; both models cluster near 50%, with GPT-4o slightly ahead</div>
+    </div>
+
+    <!-- MMLU -->
+    <div class="bench-item">
+      <div class="bench-label">MMLU <small>&mdash; massive multitask language understanding</small></div>
+      <div class="bar-row">
+        <span class="bar-name">Hermes 3 405B</span>
+        <div class="bar-track"><div class="bar-fill hermes" style="width:86.5%;">86.5%</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">GPT-4o</span>
+        <div class="bar-track"><div class="bar-fill openai" style="width:88.7%;">88.7%</div></div>
+      </div>
+      <div class="bench-note">Near parity on broad knowledge; Hermes 3 405B is the strongest open-weight contender</div>
+    </div>
+
+    <!-- IFEval -->
+    <div class="bench-item">
+      <div class="bench-label">IFEval <small>&mdash; instruction following</small></div>
+      <div class="bar-row">
+        <span class="bar-name">Hermes 3 405B</span>
+        <div class="bar-track"><div class="bar-fill hermes" style="width:88.5%;">88.5%</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">GPT-4o</span>
+        <div class="bar-track"><div class="bar-fill openai" style="width:86.9%;">86.9%</div></div>
+      </div>
+      <div class="bench-note">Hermes 3 edges ahead &mdash; its fine-tuning emphasizes precise instruction adherence</div>
+    </div>
+
+    <!-- MT-Bench -->
+    <div class="bench-item">
+      <div class="bench-label">MT-Bench <small>&mdash; multi-turn conversation quality (out of 10)</small></div>
+      <div class="bar-row">
+        <span class="bar-name">Hermes 3 405B</span>
+        <div class="bar-track"><div class="bar-fill hermes" style="width:87.5%;">8.75</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">GPT-4o</span>
+        <div class="bar-track"><div class="bar-fill openai" style="width:93.1%;">9.31</div></div>
+      </div>
+      <div class="bench-note">GPT-4o&rsquo;s RLHF polish shows in conversational quality</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ USE CASE VERDICTS ============ -->
+<section>
+  <div class="section-title"><span class="icon">&#9878;</span> Use-Case Verdicts</div>
+  <div class="verdict-grid">
+
+    <div class="verdict-card">
+      <span class="vc-title">Enterprise Chat &amp; Support</span>
+      <span class="vc-winner winner-openai">Winner: OpenAI</span>
+      <span class="vc-reason">Turnkey API, managed infra, and Assistants API make deployment effortless at scale.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Privacy-Critical Applications</span>
+      <span class="vc-winner winner-hermes">Winner: Hermes 3</span>
+      <span class="vc-reason">Fully local deployment means zero data leaves your network. Ideal for healthcare, legal, and finance.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Research &amp; Experimentation</span>
+      <span class="vc-winner winner-hermes">Winner: Hermes 3</span>
+      <span class="vc-reason">Open weights allow full introspection, ablation studies, and architectural experiments.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Code Generation</span>
+      <span class="vc-winner winner-openai">Winner: OpenAI</span>
+      <span class="vc-reason">GPT-4o and o3 lead on HumanEval and LiveCodeBench; best-in-class code completions.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Agentic / Tool-Use Workflows</span>
+      <span class="vc-winner winner-tie">Tie &mdash; depends on setup</span>
+      <span class="vc-reason">Both have strong function calling. Hermes 3 excels at custom agent loops; OpenAI has richer managed tooling.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Creative &amp; Unrestricted Writing</span>
+      <span class="vc-winner winner-hermes">Winner: Hermes 3</span>
+      <span class="vc-reason">Minimal content filtering and configurable system prompts give writers full creative control.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Cost at Scale (&gt;1M requests/day)</span>
+      <span class="vc-winner winner-hermes">Winner: Hermes 3</span>
+      <span class="vc-reason">Self-hosting amortizes quickly at high volume. No per-token fees after hardware investment.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Quick Prototyping / MVPs</span>
+      <span class="vc-winner winner-openai">Winner: OpenAI</span>
+      <span class="vc-reason">One API key and you're running. Zero infra setup, great docs, and a broad ecosystem of SDKs.</span>
+    </div>
+
+    <div class="verdict-card">
+      <span class="vc-title">Custom Fine-Tuning</span>
+      <span class="vc-winner winner-hermes">Winner: Hermes 3</span>
+      <span class="vc-reason">Full weight access enables LoRA, QLoRA, DPO, merging, and domain-specific adaptation with no restrictions.</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section>
+  <div class="section-title"><span class="icon">&#128176;</span> Pricing Comparison</div>
+  <div class="pricing-grid">
+
+    <div class="price-card hermes-card">
+      <h3 style="color:var(--hermes);">Hermes 3 (Nous Research)</h3>
+      <p class="subtitle">Open-weight &mdash; self-host or use third-party inference</p>
+      <div class="price-row"><span class="label">Model Weights</span><span class="value price-highlight">Free (open)</span></div>
+      <div class="price-row"><span class="label">Self-Host (8B, 1x A100)</span><span class="value">~$1.50 &ndash; $2.50/hr GPU rental</span></div>
+      <div class="price-row"><span class="label">Self-Host (70B, 2x A100)</span><span class="value">~$4 &ndash; $6/hr GPU rental</span></div>
+      <div class="price-row"><span class="label">Self-Host (405B, 8x A100)</span><span class="value">~$16 &ndash; $24/hr GPU rental</span></div>
+      <div class="price-row"><span class="label">Nous API (8B)</span><span class="value">~$0.10 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">Nous API (70B)</span><span class="value">~$0.50 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">Third-Party (Together, etc.)</span><span class="value">$0.10 &ndash; $2.50 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">Fine-Tuning Cost</span><span class="value price-highlight">Your compute only</span></div>
+    </div>
+
+    <div class="price-card openai-card">
+      <h3 style="color:var(--openai);">OpenAI</h3>
+      <p class="subtitle">Proprietary API &mdash; pay-per-token</p>
+      <div class="price-row"><span class="label">GPT-4o Input</span><span class="value">$2.50 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">GPT-4o Output</span><span class="value">$10.00 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">GPT-4o-mini Input</span><span class="value">$0.15 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">GPT-4o-mini Output</span><span class="value">$0.60 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">o3 Input</span><span class="value">$10.00 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">o3 Output</span><span class="value">$40.00 / 1M tokens</span></div>
+      <div class="price-row"><span class="label">Fine-Tuning (GPT-4o)</span><span class="value">$25.00 / 1M training tokens</span></div>
+      <div class="price-row"><span class="label">ChatGPT Plus</span><span class="value">$20/month</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ TL;DR ============ -->
+<section>
+  <div class="section-title"><span class="icon">&#128161;</span> Bottom Line</div>
+  <div class="card" style="padding:28px;">
+    <p style="font-size:1rem;line-height:1.8;">
+      <strong style="color:var(--hermes);">Hermes 3</strong> is the top choice when you need
+      <em>full control</em>: open weights, unrestricted fine-tuning, local deployment for privacy,
+      and freedom from content-policy constraints. Its 405B variant approaches GPT-4o-class performance
+      on many benchmarks while costing nothing beyond your compute budget.
+    </p>
+    <p style="font-size:1rem;line-height:1.8;margin-top:14px;">
+      <strong style="color:var(--openai);">OpenAI's models</strong> remain the best pick for
+      <em>maximum raw capability</em> with zero infrastructure effort. GPT-4o and the o-series models
+      lead on the hardest reasoning and code benchmarks, ship with polished APIs, and offer the fastest
+      path from idea to production for teams that don't want to manage GPUs.
+    </p>
+    <p style="font-size:1rem;line-height:1.8;margin-top:14px;color:var(--text-muted);">
+      They aren't mutually exclusive &mdash; many teams use Hermes 3 for privacy-sensitive or
+      high-volume workloads and OpenAI for top-tier reasoning tasks, getting the best of both worlds.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <p>Comparison assembled from publicly available benchmarks, Nous Research publications, and OpenAI documentation.</p>
+    <p style="margin-top:6px;">Benchmark numbers are approximate and may vary with prompting strategy and evaluation harness.</p>
+  </div>
+</footer>
+
+</body>
+</html>

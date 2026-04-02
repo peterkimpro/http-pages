@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes Agent vs OpenClaw — 2026 Comparison</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent-blue: #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-green: #3fb950;
+    --accent-orange: #d29922;
+    --accent-red: #f85149;
+    --hermes: #f0883e;
+    --openclaw: #58a6ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2.5rem 2rem;
+    background: linear-gradient(135deg, rgba(240,136,62,0.08), rgba(88,166,255,0.08));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  .header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--hermes), var(--openclaw));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .subtitle { color: var(--text-muted); font-size: 1.1rem; }
+  .header .date { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; }
+
+  /* Section */
+  .section { margin-bottom: 2.5rem; }
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  .card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card h3 .dot {
+    width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+  }
+  .card p, .card li { color: var(--text-muted); font-size: 0.95rem; }
+  .card ul { padding-left: 1.2rem; }
+  .card li { margin-bottom: 0.3rem; }
+
+  /* Stats row */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .stat-card .label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-card .values { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem; }
+  .stat-card .val { font-size: 1.4rem; font-weight: 700; }
+  .stat-card .tag { font-size: 0.7rem; color: var(--text-muted); }
+
+  /* Feature table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--surface2); }
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  th { font-weight: 600; color: var(--text); }
+  td { color: var(--text-muted); }
+  td:first-child { color: var(--text); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .check { color: var(--accent-green); font-weight: 700; }
+  .cross { color: var(--accent-red); font-weight: 700; }
+  .partial { color: var(--accent-orange); font-weight: 700; }
+
+  /* Pros/Cons */
+  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 700px) { .pros-cons { grid-template-columns: 1fr; } }
+  .pros-cons .card h3.pro { color: var(--accent-green); }
+  .pros-cons .card h3.con { color: var(--accent-red); }
+
+  /* Verdict */
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(240,136,62,0.06), rgba(88,166,255,0.06));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+  .verdict-box h3 { font-size: 1.2rem; margin-bottom: 1rem; }
+  .verdict-box p { color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.95rem; }
+  .verdict-box strong { color: var(--text); }
+
+  /* Use case tags */
+  .use-case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 700px) { .use-case-grid { grid-template-columns: 1fr; } }
+  .use-tag {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0.2rem 0.2rem 0.2rem 0;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  .footer a { color: var(--accent-blue); text-decoration: none; }
+
+  /* Security callout */
+  .callout {
+    background: rgba(248, 81, 73, 0.08);
+    border: 1px solid rgba(248, 81, 73, 0.3);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+  }
+  .callout h4 { color: var(--accent-red); margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .callout p { color: var(--text-muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Hermes Agent vs OpenClaw</h1>
+    <div class="subtitle">The two leading open-source AI agents of 2026 — compared head-to-head</div>
+    <div class="date">Last updated: April 2, 2026</div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">GitHub Stars</div>
+      <div class="values">
+        <div><div class="val" style="color:var(--hermes)">6K</div><div class="tag">Hermes</div></div>
+        <div><div class="val" style="color:var(--openclaw)">307K</div><div class="tag">OpenClaw</div></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="label">License</div>
+      <div class="values">
+        <div><div class="val" style="color:var(--hermes);font-size:1rem">Apache 2.0</div><div class="tag">Hermes</div></div>
+        <div><div class="val" style="color:var(--openclaw);font-size:1rem">MIT</div><div class="tag">OpenClaw</div></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Min Deploy Cost</div>
+      <div class="values">
+        <div><div class="val" style="color:var(--hermes)">$5/mo</div><div class="tag">Hermes</div></div>
+        <div><div class="val" style="color:var(--openclaw)">$6/mo</div><div class="tag">OpenClaw</div></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Initial Release</div>
+      <div class="values">
+        <div><div class="val" style="color:var(--hermes);font-size:1rem">Feb 2026</div><div class="tag">Hermes</div></div>
+        <div><div class="val" style="color:var(--openclaw);font-size:1rem">Nov 2025</div><div class="tag">OpenClaw</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div class="section">
+    <h2 class="section-title">Overview</h2>
+    <div class="cards">
+      <div class="card">
+        <h3><span class="dot" style="background:var(--hermes)"></span> Hermes Agent</h3>
+        <p>Built by <strong>Nous Research</strong>. A self-improving autonomous AI agent with persistent memory, automatic skill creation, and a learning loop that gets better the more you use it. Optimized for <strong>personal/solo operators</strong> who want a long-running agent that compounds knowledge over time.</p>
+        <ul style="margin-top:0.75rem">
+          <li>Episodic memory — learns from successes and failures</li>
+          <li>Auto-creates reusable skills after complex tasks</li>
+          <li>40+ built-in tools, cron scheduler</li>
+          <li>Supports OpenAI, Anthropic, Ollama (local models)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--openclaw)"></span> OpenClaw</h3>
+        <p>Created by <strong>Peter Steinberger</strong> (now at OpenAI). The fastest-growing open-source project on GitHub ever (247K stars in 60 days). A general-purpose AI agent focused on <strong>broad reactive capability</strong> with flexible tool chaining and massive community ecosystem.</p>
+        <ul style="margin-top:0.75rem">
+          <li>Originally "Clawdbot" — renamed after Anthropic trademark complaint</li>
+          <li>Now maintained by an open-source foundation</li>
+          <li>Massive plugin/skill ecosystem (community-driven)</li>
+          <li>Supports Claude, GPT, DeepSeek, Gemini, local models</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Architecture -->
+  <div class="section">
+    <h2 class="section-title">Architecture</h2>
+    <div class="cards">
+      <div class="card">
+        <h3><span class="dot" style="background:var(--hermes)"></span> Hermes Architecture</h3>
+        <ul>
+          <li><strong>Core loop:</strong> AI agent loop with tool discovery & orchestration</li>
+          <li><strong>Memory:</strong> Episodic memory store (SQLite) — logs what worked/failed per task</li>
+          <li><strong>Skills engine:</strong> Auto-generates reusable skills from successful task completions</li>
+          <li><strong>Gateway:</strong> Unified session routing across all messaging platforms</li>
+          <li><strong>Scheduler:</strong> Built-in cron with natural language scheduling</li>
+          <li><strong>State:</strong> SQLite-backed session/state database</li>
+          <li><strong>Editor:</strong> LSP-compatible editor integration server</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--openclaw)"></span> OpenClaw Architecture</h3>
+        <ul>
+          <li><strong>Core loop:</strong> Reactive tool-chaining agent with flexible routing</li>
+          <li><strong>Memory:</strong> Per-assistant isolated persistent storage (cross-session)</li>
+          <li><strong>Skills:</strong> Community skill marketplace (ClawHub) — no auto-generation</li>
+          <li><strong>Gateway:</strong> Multi-platform adapter (Signal, Telegram, Discord, WhatsApp)</li>
+          <li><strong>Sandbox:</strong> SSH sandboxing (v2026.3.22+), NemoClaw for enterprise</li>
+          <li><strong>Plugins:</strong> First-class plugin architecture with hot-reload</li>
+          <li><strong>Routing:</strong> Model routing — budget models for routine, premium for complex</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Comparison Table -->
+  <div class="section">
+    <h2 class="section-title">Feature Comparison</h2>
+    <table>
+      <thead>
+        <tr><th>Feature</th><th style="color:var(--hermes)">Hermes Agent</th><th style="color:var(--openclaw)">OpenClaw</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Self-improving / Learning Loop</td><td class="check">Yes — core feature</td><td class="cross">No native skill learning</td></tr>
+        <tr><td>Persistent Memory</td><td class="check">Episodic + search/summarize</td><td class="check">Per-assistant isolated storage</td></tr>
+        <tr><td>Auto Skill Creation</td><td class="check">Yes — builds & refines skills</td><td class="cross">Manual / community skills only</td></tr>
+        <tr><td>Built-in Tools</td><td class="check">40+</td><td class="check">45+ (as of v2026.3.22)</td></tr>
+        <tr><td>Plugin Ecosystem</td><td class="partial">Growing — smaller community</td><td class="check">Massive — ClawHub marketplace</td></tr>
+        <tr><td>Multi-platform Messaging</td><td class="check">Telegram, Discord, Slack, WhatsApp, Signal, CLI</td><td class="check">Signal, Telegram, Discord, WhatsApp</td></tr>
+        <tr><td>Cron / Scheduling</td><td class="check">Built-in, natural language</td><td class="partial">Via plugins</td></tr>
+        <tr><td>Model Support</td><td class="check">OpenAI, Anthropic, Ollama, OpenRouter (200+)</td><td class="check">Claude, GPT, DeepSeek, Gemini, local</td></tr>
+        <tr><td>Smart Model Routing</td><td class="cross">Manual selection</td><td class="check">Auto-routes budget vs premium</td></tr>
+        <tr><td>Browser Automation</td><td class="check">Live Chrome CDP connect</td><td class="check">Built-in browser tools</td></tr>
+        <tr><td>Editor Integration</td><td class="check">LSP-compatible server</td><td class="check">VS Code, JetBrains extensions</td></tr>
+        <tr><td>Sandboxing</td><td class="partial">Standard OS isolation</td><td class="check">SSH sandbox + NemoClaw (enterprise)</td></tr>
+        <tr><td>Multi-agent Orchestration</td><td class="partial">Single agent focus</td><td class="check">Multi-assistant with shared workspaces</td></tr>
+        <tr><td>Self-hostable</td><td class="check">$5/mo VPS</td><td class="check">$6/mo VPS</td></tr>
+        <tr><td>Team / Business Use</td><td class="partial">Solo-operator focused</td><td class="check">Team routing, shared workspaces, RBAC</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Performance & Cost -->
+  <div class="section">
+    <h2 class="section-title">Performance & Cost</h2>
+    <div class="cards">
+      <div class="card">
+        <h3><span class="dot" style="background:var(--hermes)"></span> Hermes</h3>
+        <ul>
+          <li><strong>Hosting:</strong> $5/mo VPS minimum</li>
+          <li><strong>LLM costs:</strong> Bring your own API key (pay provider directly)</li>
+          <li><strong>Efficiency gains:</strong> Skill reuse reduces repeat API calls over time</li>
+          <li><strong>Cold start:</strong> Slower initially — value compounds as memory builds</li>
+          <li><strong>Best model pairing:</strong> Claude Sonnet 4 or GPT-5 via OpenRouter</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--openclaw)"></span> OpenClaw</h3>
+        <ul>
+          <li><strong>Personal:</strong> $6–$13/mo (hosting + API)</li>
+          <li><strong>Business:</strong> $25–$100/mo depending on scale</li>
+          <li><strong>Heavy automation:</strong> $100–$200+/mo</li>
+          <li><strong>API costs:</strong> $6–$30 per 1M tokens (model-dependent)</li>
+          <li><strong>Best model pairing:</strong> Claude Opus 4.6 (reliability) or Gemini 3.1 Pro (cost)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security -->
+  <div class="section">
+    <h2 class="section-title">Security</h2>
+    <div class="cards">
+      <div class="card">
+        <h3><span class="dot" style="background:var(--hermes)"></span> Hermes</h3>
+        <p>Smaller attack surface due to tighter scope. No major CVEs reported as of April 2026. Smart approval system for tool execution. Runs in standard OS-level isolation.</p>
+        <p style="margin-top:0.5rem"><strong>Risk level:</strong> <span style="color:var(--accent-green)">Lower</span> — smaller community means less scrutiny but also less exposure.</p>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--openclaw)"></span> OpenClaw</h3>
+        <p>Major security crisis in March 2026: <strong>9 CVEs in 4 days</strong>, including a 9.9/10 critical RCE. 42,900+ internet-exposed instances found, 15,200 vulnerable. Command approval bypass exploits published.</p>
+        <p style="margin-top:0.5rem"><strong>Risk level:</strong> <span style="color:var(--accent-red)">Higher</span> — massive adoption = bigger target. NemoClaw helps but is alpha-stage.</p>
+        <div class="callout">
+          <h4>OpenClaw CVE Highlights (March 2026)</h4>
+          <p><strong>CVE-2026-29607:</strong> "Allow always" approval bypass — payload swap enables RCE without re-prompting<br>
+          <strong>CVE-2026-28460:</strong> Shell line-continuation chars bypass command allowlist entirely<br>
+          <strong>9.9 Critical:</strong> Any authenticated user could escalate to admin<br>
+          NVIDIA's NemoClaw adds OpenShell sandboxing, but its own guardrails were bypassed within days of release.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pros & Cons -->
+  <div class="section">
+    <h2 class="section-title">Pros & Cons</h2>
+
+    <h3 style="color:var(--hermes); margin: 1rem 0 0.75rem;">Hermes Agent</h3>
+    <div class="pros-cons">
+      <div class="card">
+        <h3 class="pro">Pros</h3>
+        <ul>
+          <li>Self-improving — gets smarter with use</li>
+          <li>Persistent episodic memory across sessions</li>
+          <li>Auto skill creation reduces manual config</li>
+          <li>200+ model support via OpenRouter</li>
+          <li>Built-in cron scheduler (natural language)</li>
+          <li>Smaller attack surface, no major CVEs</li>
+          <li>Ideal for solo power users / founders</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="con">Cons</h3>
+        <ul>
+          <li>Tiny community (6K stars vs 307K)</li>
+          <li>Limited plugin ecosystem</li>
+          <li>No smart model routing</li>
+          <li>Single-agent focused — no multi-agent orchestration</li>
+          <li>Slower initial value — needs time to learn</li>
+          <li>Less documentation and tutorials</li>
+          <li>No enterprise features (RBAC, team workspaces)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="color:var(--openclaw); margin: 1.5rem 0 0.75rem;">OpenClaw</h3>
+    <div class="pros-cons">
+      <div class="card">
+        <h3 class="pro">Pros</h3>
+        <ul>
+          <li>Massive community and ecosystem (307K stars)</li>
+          <li>ClawHub skill marketplace — huge selection</li>
+          <li>Smart model routing (budget vs premium)</li>
+          <li>Multi-agent + shared workspace support</li>
+          <li>SSH sandboxing + NemoClaw enterprise layer</li>
+          <li>Frequent updates, large dev team</li>
+          <li>Team/business features (RBAC, routing)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="con">Cons</h3>
+        <ul>
+          <li>9 CVEs in March 2026 — serious security concerns</li>
+          <li>No learning loop — every task starts from scratch</li>
+          <li>Skill marketplace has malicious submission risk (Cisco flagged)</li>
+          <li>Creator left for OpenAI — foundation governance TBD</li>
+          <li>Larger attack surface due to popularity</li>
+          <li>NemoClaw guardrails already bypassed</li>
+          <li>Higher cost at scale ($100-200+/mo for heavy use)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Use Cases -->
+  <div class="section">
+    <h2 class="section-title">Best Use Cases</h2>
+    <div class="use-case-grid">
+      <div class="card">
+        <h3><span class="dot" style="background:var(--hermes)"></span> Choose Hermes When...</h3>
+        <ul>
+          <li>You want a <strong>personal AI agent</strong> that improves over time</li>
+          <li>You run repetitive workflows that benefit from learned skills</li>
+          <li>You need deep recall across a long history of varied work</li>
+          <li>Security is a priority and you want a smaller attack surface</li>
+          <li>You're a solo founder / power user / researcher</li>
+          <li>You want unattended cron jobs (daily reports, backups, audits)</li>
+        </ul>
+        <div style="margin-top:0.75rem">
+          <span class="use-tag">Solo founders</span>
+          <span class="use-tag">Personal automation</span>
+          <span class="use-tag">Research agents</span>
+          <span class="use-tag">Long-running workflows</span>
+          <span class="use-tag">Privacy-conscious</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--openclaw)"></span> Choose OpenClaw When...</h3>
+        <ul>
+          <li>You need <strong>multi-channel business automation</strong> across teams</li>
+          <li>You want a massive plugin ecosystem out of the box</li>
+          <li>You need smart model routing to control costs at scale</li>
+          <li>Your team needs shared workspaces and RBAC</li>
+          <li>You want the largest community for support and skills</li>
+          <li>You need enterprise sandboxing (NemoClaw/OpenShell)</li>
+        </ul>
+        <div style="margin-top:0.75rem">
+          <span class="use-tag">Teams & businesses</span>
+          <span class="use-tag">Multi-channel ops</span>
+          <span class="use-tag">Plugin-heavy workflows</span>
+          <span class="use-tag">Enterprise (with NemoClaw)</span>
+          <span class="use-tag">Cost-optimized at scale</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="section">
+    <h2 class="section-title">Verdict</h2>
+    <div class="verdict-box">
+      <h3>They solve different problems.</h3>
+      <p><strong style="color:var(--hermes)">Hermes Agent</strong> is the better choice if you want a <strong>persistent personal AI that compounds value</strong>. Its learning loop, episodic memory, and auto-skill creation mean it genuinely gets better the longer you use it. For solo founders, power users, and anyone running a personal AI infrastructure (like a VDI-based command center), Hermes is purpose-built for you. The tradeoff is a smaller ecosystem and no team features.</p>
+      <p><strong style="color:var(--openclaw)">OpenClaw</strong> wins on <strong>breadth, ecosystem, and team capability</strong>. If you need one agent to handle support, sales, and ops across Slack/Telegram/Discord with team access controls, OpenClaw's infrastructure is unmatched. But the March 2026 security crisis is a real concern — 9 CVEs in 4 days, approval bypasses, and even NemoClaw's guardrails were circumvented. Proceed with caution in production.</p>
+      <p style="margin-top:1rem"><strong>Bottom line:</strong> For a solo operator who values compounding intelligence and security — <span style="color:var(--hermes)">Hermes</span>. For a team that needs broad reach, ecosystem depth, and can manage the security surface — <span style="color:var(--openclaw)">OpenClaw</span>. Neither is a universal winner; they're complementary tools for different operational philosophies.</p>
+    </div>
+  </div>
+
+  <!-- Sources -->
+  <div class="section">
+    <h2 class="section-title">Sources</h2>
+    <div class="card">
+      <ul>
+        <li><a href="https://github.com/NousResearch/hermes-agent" style="color:var(--accent-blue)">Hermes Agent — GitHub (Nous Research)</a></li>
+        <li><a href="https://hermes-agent.nousresearch.com/docs/developer-guide/architecture/" style="color:var(--accent-blue)">Hermes Agent Architecture Documentation</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/OpenClaw" style="color:var(--accent-blue)">OpenClaw — Wikipedia</a></li>
+        <li><a href="https://www.kdnuggets.com/openclaw-explained-the-free-ai-agent-tool-going-viral-already-in-2026" style="color:var(--accent-blue)">OpenClaw Explained — KDnuggets</a></li>
+        <li><a href="https://openclawai.io/blog/openclaw-cve-flood-nine-vulnerabilities-four-days-march-2026" style="color:var(--accent-blue)">Nine CVEs in Four Days: OpenClaw's March 2026 Vulnerability Flood</a></li>
+        <li><a href="https://nvidianews.nvidia.com/news/nvidia-announces-nemoclaw" style="color:var(--accent-blue)">NVIDIA Announces NemoClaw for OpenClaw</a></li>
+        <li><a href="https://www.eigent.ai/blog/openclaw-vs-hermes-agent-every-feature-that-matters-for-founders-in-2026" style="color:var(--accent-blue)">OpenClaw vs Hermes Agent — Eigent.ai</a></li>
+        <li><a href="https://medium.com/neuralnotions/hermes-vs-openclaw-the-first-real-rival-in-the-autonomous-ai-agent-race-c2e0f486e52c" style="color:var(--accent-blue)">Hermes vs OpenClaw: The Autonomous AI Agent Race — Medium</a></li>
+        <li><a href="https://thunderbit.com/blog/openclaw-pricing-and-plans" style="color:var(--accent-blue)">OpenClaw Pricing in 2026 — Thunderbit</a></li>
+        <li><a href="https://www.penligent.ai/hackinglabs/nvidia-openclaw-security-what-nemoclaw-changes-and-what-it-still-cannot-fix" style="color:var(--accent-blue)">What NemoClaw Changes and What It Still Cannot Fix — Penligent</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated by Peter Kim's AI Orchestrator &mdash; April 2, 2026<br>
+    <a href="https://github.com/peterkimpro">github.com/peterkimpro</a>
+  </div>
+
+</div>
+</body>
+</html>
